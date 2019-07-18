@@ -19,7 +19,7 @@ import qs from 'qs'
 //     )
 // }
 
-export const reqLogin = (username,password)=>(ajax.post('/login2',{username,password}))
+export const reqLogin = (username,password)=>(ajax.post('/login',{username,password}))
 reqLogin('admin','admin')
 // .then(resault=>{
 //     console.log(resault,'请求成功')

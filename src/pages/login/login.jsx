@@ -1,9 +1,13 @@
 import React, {Component} from 'react'
+import { Redirect } from "react-router-dom"
 import {Form,Input,Icon,Button,message} from 'antd'
 
+import memoryUtils from '../../utils/memoryUtils'
+import storageUtils from '../../utils/storageUtils'
 import logo from './images/logo.png'
 import './login.less'
 import {reqLogin} from '../../api'
+
 
 const Item = Form.Item
 
@@ -20,6 +24,16 @@ class Login extends Component {
       if (!err) {
        const resault = await reqLogin(username,password);
        if(resault.status===0){
+          // 将user信息保存到local
+          const user = resault.data
+          // 设置原生保存用户名到localStorage
+          // localStorage.setItem('user_key', JSON.stringify(user))
+
+
+          //工具方法实现保存并放入内存中!
+          storageUtils.saveUser(user)
+          memoryUtils.user = user
+           
          this.props.history.replace('/');
          message.success('登录成功');
        }else{
@@ -46,6 +60,12 @@ class Login extends Component {
     
   }
   render() {
+    // 原生读取用户名，如果有就直接去admin路由组件
+    // const user = JSON.parse(localStorage.getItem('user_key')||'{}')
+    const user = memoryUtils.user
+    if(user._id){
+      return <Redirect to='/'/>
+    }
     const { getFieldDecorator } = this.props.form;
     return (
       <div className='login'>
