@@ -4,15 +4,17 @@ import {
   Modal, message
 } from 'antd';
 
+import {reqWeather} from '../../api'
 import storageUtils from '../../utils/storageUtils'
 import memoryUtils from '../../utils/memoryUtils'
 import {formateDate} from '../../utils/dateUtils'
 import menuList from '../../config/menuConfig'
+import LinkBtton from '../link-button'
 import './index.less'
 
 class Header extends Component {
   state = {
-    currentTime: formateDate(Date.now())
+    currentTime: formateDate(Date.now()),
   }
   logout=()=>{
     Modal.confirm({
@@ -46,12 +48,21 @@ class Header extends Component {
     })
     return title;
   }
+  getWeather = async () => {
+    const {dayPictureUrl,weather} = await reqWeather('北京')
+    this.setState({
+    weather,
+    dayPictureUrl
+    })
+  }
   componentDidMount() {
     this.timer = setInterval(() => {
       this.setState({
         currentTime: formateDate(Date.now())
       })
-    },1000)
+    }, 1000)
+    //发送jsonp请求获取天气
+    this.getWeather()
   }
   componentWillUnmount() {
     clearInterval(this.timer)
@@ -61,14 +72,14 @@ class Header extends Component {
           <div className="header">
             <div className="header-top">
               < span > 欢迎,{memoryUtils.user.username}</span>
-              <a href='javascript:;' onClick={this.logout}>退出</a>
+              <LinkBtton onClick={this.logout}>退出</LinkBtton>
             </div>
             <div className="header-bottom">
               <div className="header-bottom-left">{this.getTitle()}</div>
               <div className="header-bottom-right">
                 <span>{this.state.currentTime}</span>
-                <img src="http://api.map.baidu.com/images/weather/day/duoyun.png" alt="weather"/>
-                <span>晴</span>
+                <img src={this.state.dayPictureUrl} alt="weather"/>
+                <span>{this.state.weather}</span>
               </div>
             </div>
           </div>
